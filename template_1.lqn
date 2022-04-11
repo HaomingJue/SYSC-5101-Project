@@ -129,9 +129,15 @@ A WebServer
 	y diskFetch sendStatic 1 
 	s cacheEnd 0
 	y cacheEnd sendStatic 1
+	s webServerEnd 0
 :
-	analyze -> ($PS)cache + ($1_PS)cgiDrive;
-	cache -> ($PCM)diskFetch + ($1_PCM)cacheEnd
+	analyze -> (0.9)cache + (0.1)cgiDrive;
+	cache -> (0.3)diskFetch + (0.7)cacheEnd;
+	cacheEnd + diskFetch + cgiDrive -> webServerEnd;
+	webServerEnd[webServer]
+	#cacheEnd[webServer];
+	#diskFetch[webServer];
+	#cgiDrive[webServer]
 -1
 
 A CGIApp
@@ -142,11 +148,13 @@ A CGIApp
 	s cdPage 5
 	y cdPage dbRead 4.3
 	y cdPage sendDynamic 1
+	s cgiAppEnd 0
 	#s cgiEnd 0
 	#y cgiEnd sendStatic 1
 :
-	cgiStart -> ($PR)procData + ($1_PR)cdPage
-    #procData + cdPage -> cgiEnd
+	cgiStart -> (0.6)procData + (0.4)cdPage;
+	procData + cdPage -> cgiAppEnd;
+	cgiAppEnd[cgiApp]
 -1
 
 #================= Observations ======================
