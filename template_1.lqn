@@ -61,7 +61,7 @@ T 0
   t WebServer n webServer -1 WSP
   t WebDisk n webRorW -1 WSDisk
   t CGIApp n cgiApp -1 WSP
-  t WebReply n sendPage -1 WSP
+  t WebReply n sendStatic sendDynamic -1 WSP
   t GetObjects n getObjects -1 WSP
   t ProReply n proReply -1 WSP
   t DBProcess n dbUpdate dbRead -1 DBP
@@ -94,9 +94,10 @@ E 0
 # ---------- webDisk ----------
   s webRorW 0.1 -1
 # ---------- webServer 2.0 ----------
-  s sendPage 0.8 -1
-  y sendPage proReply 1 -1
-  y sendPage getObjects 8 -1
+  s sendStatic 0.8 -1
+  y sendStatic proReply 1 -1
+  s sendDynamic 0.8 -1
+  y sendDynamic getObjects 8 -1
   s getObjects 1 -1
   y getObjects webRorW 0.2 -1
 # ---------- protocol 2.0 ----------
@@ -121,10 +122,10 @@ A WebServer
 	s cgiDrive 0
 	y cgiDrive cgiApp 1
 	s diskFetch 1
-	
 	y diskFetch webRorW 3
+	y diskFetch sendStatic 1 
 	s cacheEnd 0
-	y cacheEnd sendPage 1
+	y cacheEnd sendStatic 1
 :
 	analyze -> ($PS)cache + ($1_PS)cgiDrive;
 	cache -> ($PCM)diskFetch + ($1_PCM)cacheEnd
@@ -134,12 +135,12 @@ A CGIApp
 	s cgiStart 0
 	s procData 15 
 	y procData dbUpdate 1.7
-	y procData sendPage 1
+	y procData sendStatic 1
 	s cdPage 5
 	y cdPage dbRead 4.3
-	y cdPage sendPage 1
+	y cdPage sendDynamic 1
 	#s cgiEnd 0
-	#y cgiEnd sendPage 1
+	#y cgiEnd sendStatic 1
 :
 	cgiStart -> ($PR)procData + ($1_PR)cdPage
     #procData + cdPage -> cgiEnd
