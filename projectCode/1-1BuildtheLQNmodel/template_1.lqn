@@ -7,7 +7,7 @@
 # ------------------------------------------------------------------------
 
 #================= Variables ======================
-$N=3
+$N=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
 
 $PS=0.9
 $1_PS=0.1
@@ -59,16 +59,16 @@ T 0
 #         | i {infinite or delay server}
 #         | z <real> {think time}
 #         | <int> {task priority}
-  t User r user -1 UP z 1 m $N
-  t Protocol n protocol -1 WSP
-  t WebServer n webServer -1 WSP 
-  t WebDisk n webRorW -1 WSDisk
-  t CGIApp n cgiApp -1 WSP
-  t WebReply n sendStatic1 sendStatic2 sendDynamic -1 WSP %f $thru1
-  t GetObjects n getObjects -1 WSP %f $thru2
-  t ProtocolReply n packet -1 WSP
-  t DBProcess n dbUpdate dbRead -1 DBP
-  t DBOperation n read write -1 DBDisk
+  t User r user -1 UP z 1 m $N 
+  t Protocol n protocol -1 WSP %f $thruProtocol %u $uProtocol
+  t WebServer n webServer -1 WSP %f $thruWebServer %u $uWebServer
+  t WebDisk n webRorW -1 WSDisk %f $thruWDisk %u $uWDisk
+  t CGIApp n cgiApp -1 WSP %f $thruCGIAPP %u $uCGIAPP
+  t WebReply n sendStatic sendDynamic -1 WSP %f $thruWebReply %u $uWebReply
+  t GetObjects n getObjects -1 WSP %f $thruGetObjects %u $uGetObjects
+  t ProtocolReply n packet -1 WSP %f $thruProtReply %u $uProtReplly
+  t DBProcess n dbUpdate dbRead -1 DBP %f $thruDBProcess %u $uDBProcess
+  t DBOperation n read write -1 DBDisk %f $thruDBOpt %u $uDBOpt
 -1
 
 
@@ -88,19 +88,17 @@ E 0
 #       z - AsynchronousCalls {no. of send-no-reply messages} 
 # ---------- user ----------
   s user 0 -1
-  y user protocol 1 -1
+  y user protocol 1 -1 %w1 $wUser
 # ---------- protocol ----------
   s protocol 0.25 -1
-  y protocol webServer 1 -1
+  y protocol webServer 1 -1 %w1 $wProtocol
 # ---------- webserver ----------
   A webServer analyze
 # ---------- webDisk ----------
   s webRorW 0.1 -1
 # ---------- sendPage ----------
-  s sendStatic1 0.8 -1
-  y sendStatic1 packet 16 -1
-  s sendStatic2 0.8 -1
-  y sendStatic2 packet 16 -1
+  s sendStatic 0.8 -1
+  y sendStatic packet 16 -1
   s sendDynamic 0.8 -1
   y sendDynamic getObjects 8 -1
   y sendDynamic packet 40 -1
@@ -129,9 +127,9 @@ A WebServer
 	y cgiDrive cgiApp 1
 	s diskFetch 1
 	y diskFetch webRorW 3
-	y diskFetch sendStatic1 1 
+	y diskFetch sendStatic 1 
 	s cacheEnd 0
-	y cacheEnd sendStatic2 1
+	y cacheEnd sendStatic 1
 	s webServerEnd 0
 :
 	analyze -> (0.9)cache + (0.1)cgiDrive;
@@ -147,7 +145,7 @@ A CGIApp
 	s cgiStart 0
 	s procData 15 
 	y procData dbUpdate 1.7
-	y procData sendStatic1 1
+	y procData sendStatic 1
 	s cdPage 5
 	y cdPage dbRead 4.3
 	y cdPage sendDynamic 1
@@ -163,6 +161,29 @@ A CGIApp
 #================= Observations ======================
 R 0
 $0=$N
-#$threads 
-$thru1 $thru2 
+
+$thruProtocol 
+$thruWebServer
+$thruWDisk
+$thruCGIAPP
+$thruWebReply
+$thruGetObjects
+$thruProtReply
+$thruDBProcess
+$thruDBOpt
+
+$N
+$uProtocol
+$uWebServer
+$uWDisk
+$uCGIAPP
+$uWebReply
+$uGetObjects
+$uProtReplly
+$uDBProcess
+$uDBOpt
+
+$N
+
+
 -1
