@@ -1,3 +1,6 @@
+#put your code in a directory "projectCode" then exeute
+# python drawSVG --folder="foldername" --file="codename" --number="number of experiments"
+
 from fileinput import filename
 import os
 import argparse
