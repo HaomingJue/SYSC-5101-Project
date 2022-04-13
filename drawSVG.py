@@ -1,7 +1,6 @@
 #put your code in a directory "projectCode" then exeute
 # python drawSVG --folder="foldername" --file="codename" --number="number of experiments"
 
-from fileinput import filename
 import os
 import argparse
 
@@ -10,7 +9,7 @@ parser.add_argument('--folder', type=str,
                     help='please add foldername')
 parser.add_argument('--file', type=str, 
                     help='please add filename')
-parser.add_argument('--number', type=int, default=20,
+parser.add_argument('--number', type=int, default=40,
                     help="please input number of cases")
 
 args = parser.parse_args()
