@@ -1,0 +1,353 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<!-- lqns -->
+<lqn-model name="NewScenario" description="lqns 5.26 solution for model from: NewScenario.lqn." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:///C:/Program Files/LQN Solvers/lqn.xsd">
+   <!-- Variables: $CGIAppThread = 30, $CGIPThread = 4, $DBPThread = 20, $DBProcessThread = 25, $DistributorThread = 60, $N = 2500, $PRThread = 15, $Prot1Thread = 30, $Prot2Thread = 30, $ProtP1Thread = 6, $ProtP2Thread = 12, $WReplyThread = 40, $WSPThread = 7, $WSThread = 30 -->
+   <solver-params comment="Layers: 1, Customers: 1, Clients: 1, Tasks: 1, (Delay: 0), Processors: 1" conv_val="1e-05" it_limit="50" underrelax_coeff="0.9" print_int="10">
+      <result-general solver-info="" valid="false" conv-val="0.00767709" iterations="50" platform-info="lqns 5.26" user-cpu-time=" 0:00:01.149" system-cpu-time=" 0:00:00.000" elapsed-time=" 0:00:01.000">
+         <mva-info submodels="7" core="350" step="15903" step-squared="906393" wait="1.90613e+07" wait-squared="2.40621e+11" faults="0"/>
+      </result-general>
+   </solver-params>
+   <processor name="UP" scheduling="inf">
+      <result-processor utilization="0"/>
+      <task name="User" scheduling="ref" multiplicity="2500" think-time="1000">
+         <result-task throughput="2.4483" utilization="51.6954" phase1-utilization="51.6954" proc-utilization="0"/>
+         <entry name="user" type="PH1PH2">
+            <result-entry utilization="51.6954" throughput="2.4483" squared-coeff-variation="6.16702" proc-utilization="0" throughput-bound="2.45915"/>
+            <entry-phase-activities>
+               <activity name="user_ph1" phase="1">
+                  <result-activity proc-waiting="0" service-time="21.1148" utilization="51.6954" service-time-variance="2749.47"/>
+                  <synch-call dest="distributor" calls-mean="1">
+                     <result-call waiting="0.857997"/>
+                  </synch-call>
+               </activity>
+            </entry-phase-activities>
+         </entry>
+      </task>
+   </processor>
+   <processor name="WSP" scheduling="fcfs" multiplicity="7">
+      <result-processor utilization="5.60295"/>
+      <task name="WebServer" scheduling="fcfs" multiplicity="30">
+         <result-task throughput="2.20228" utilization="18.7629" phase1-utilization="18.7629" proc-utilization="2.86296"/>
+         <entry name="webServer" type="NONE">
+            <result-entry utilization="18.7629" throughput="2.20228" squared-coeff-variation="1.22727" proc-utilization="2.86296" throughput-bound="1.77059" phase1-service-time="8.51979" phase1-service-time-variance="89.0839" phase1-utilization="18.7629"/>
+         </entry>
+         <task-activities>
+            <activity name="cache" bound-to-entry="webServer" host-demand-mean="1">
+               <result-activity proc-waiting="0.0443815" service-time="1.04438" utilization="2.30001" service-time-variance="1.00197" throughput="2.20228" proc-utilization="2.20228"/>
+            </activity>
+            <activity name="cacheEnd">
+               <result-activity proc-waiting="0" service-time="6.99601" utilization="10.785" service-time-variance="149.57" throughput="1.54159" proc-utilization="0"/>
+               <synch-call dest="sendStatic" calls-mean="1">
+                  <result-call waiting="0"/>
+               </synch-call>
+            </activity>
+            <activity name="diskFetch" host-demand-mean="1">
+               <result-activity proc-waiting="0.221907" service-time="8.59401" utilization="5.67791" service-time-variance="158.407" throughput="0.660683" proc-utilization="0.660683"/>
+               <synch-call dest="webRorW" calls-mean="3">
+                  <result-call waiting="0.0253685"/>
+               </synch-call>
+               <synch-call dest="sendStatic" calls-mean="1">
+                  <result-call waiting="0"/>
+               </synch-call>
+            </activity>
+            <activity name="webServerEnd">
+               <result-activity proc-waiting="0" service-time="0" utilization="0" throughput="2.20228" proc-utilization="0"/>
+            </activity>
+            <precedence>
+               <pre>
+                  <activity name="cache"/>
+               </pre>
+               <post-OR>
+                  <activity name="cacheEnd" prob="0.7"/>
+                  <activity name="diskFetch" prob="0.3"/>
+               </post-OR>
+            </precedence>
+            <precedence>
+               <pre-OR>
+                  <activity name="cacheEnd"/>
+                  <activity name="diskFetch"/>
+               </pre-OR>
+               <post>
+                  <activity name="webServerEnd"/>
+               </post>
+            </precedence>
+            <precedence>
+               <pre>
+                  <activity name="webServerEnd"/>
+               </pre>
+            </precedence>
+            <reply-entry name="webServer">
+               <reply-activity name="webServerEnd"/>
+            </reply-entry>
+         </task-activities>
+      </task>
+      <task name="WebReply" scheduling="fcfs" multiplicity="40">
+         <result-task throughput="2.44645" utilization="21.6032" phase1-utilization="21.6032" proc-utilization="1.95716"/>
+         <entry name="sendStatic" type="PH1PH2">
+            <result-entry utilization="16.4369" throughput="2.34857" squared-coeff-variation="1.05793" proc-utilization="1.87885" throughput-bound="2.82353"/>
+            <entry-phase-activities>
+               <activity name="sendStatic_ph1" phase="1" host-demand-mean="0.8">
+                  <result-activity proc-waiting="0.771669" service-time="6.99869" utilization="16.4369" service-time-variance="51.819"/>
+                  <synch-call dest="packet" calls-mean="16">
+                     <result-call waiting="0.0374795"/>
+                  </synch-call>
+               </activity>
+            </entry-phase-activities>
+         </entry>
+         <entry name="sendDynamic" type="PH1PH2">
+            <result-entry utilization="5.16627" throughput="0.0978823" squared-coeff-variation="0.676405" proc-utilization="0.0783059" throughput-bound="0.970176"/>
+            <entry-phase-activities>
+               <activity name="sendDynamic_ph1" phase="1" host-demand-mean="0.8">
+                  <result-activity proc-waiting="2.22422" service-time="52.7804" utilization="5.16627" service-time-variance="1884.31"/>
+                  <synch-call dest="getObjects" calls-mean="8">
+                     <result-call waiting="3.45312"/>
+                  </synch-call>
+                  <synch-call dest="packet" calls-mean="40">
+                     <result-call waiting="0.0374795"/>
+                  </synch-call>
+               </activity>
+            </entry-phase-activities>
+         </entry>
+      </task>
+      <task name="GetObjects" scheduling="fcfs">
+         <result-task throughput="0.782834" utilization="0.838142" phase1-utilization="0.838142" proc-utilization="0.782834"/>
+         <entry name="getObjects" type="PH1PH2">
+            <result-entry utilization="0.838142" throughput="0.782834" squared-coeff-variation="0.937908" proc-utilization="0.782834" throughput-bound="0.629542"/>
+            <entry-phase-activities>
+               <activity name="getObjects_ph1" phase="1" host-demand-mean="1">
+                  <result-activity proc-waiting="0.0458267" service-time="1.07065" utilization="0.838142" service-time-variance="1.07512"/>
+                  <synch-call dest="webRorW" calls-mean="0.2">
+                     <result-call waiting="0.0241281"/>
+                  </synch-call>
+               </activity>
+            </entry-phase-activities>
+         </entry>
+      </task>
+   </processor>
+   <processor name="CGIP" scheduling="fcfs" multiplicity="4">
+      <result-processor utilization="2.69206"/>
+      <task name="CGIApp" scheduling="fcfs" multiplicity="30">
+         <result-task throughput="0.244733" utilization="25.8837" phase1-utilization="25.8837" proc-utilization="2.69206"/>
+         <entry name="cgiApp" type="NONE">
+            <result-entry utilization="25.8837" throughput="0.244733" squared-coeff-variation="0.642976" proc-utilization="2.69206" throughput-bound="0.196732" phase1-service-time="105.763" phase1-service-time-variance="7192.23" phase1-utilization="25.8837"/>
+         </entry>
+         <task-activities>
+            <activity name="cdPage" host-demand-mean="5">
+               <result-activity proc-waiting="2.92003" service-time="149.733" utilization="14.6579" service-time-variance="20545.4" throughput="0.0978931" proc-utilization="0.489466"/>
+               <synch-call dest="dbRead" calls-mean="4.3">
+                  <result-call waiting="0.0727058"/>
+               </synch-call>
+               <synch-call dest="sendDynamic" calls-mean="1">
+                  <result-call waiting="0"/>
+               </synch-call>
+            </activity>
+            <activity name="cgiAppEnd">
+               <result-activity proc-waiting="0" service-time="0" utilization="0" throughput="0.244733" proc-utilization="0"/>
+            </activity>
+            <activity name="cgiStart" bound-to-entry="cgiApp">
+               <result-activity proc-waiting="0" service-time="0" utilization="0" throughput="0.244733" proc-utilization="0"/>
+            </activity>
+            <activity name="procData" host-demand-mean="15">
+               <result-activity proc-waiting="1.71494" service-time="76.4497" utilization="11.2259" service-time-variance="7266.81" throughput="0.14684" proc-utilization="2.2026"/>
+               <synch-call dest="dbUpdate" calls-mean="1.7">
+                  <result-call waiting="0.0726873"/>
+               </synch-call>
+               <synch-call dest="sendStatic" calls-mean="1">
+                  <result-call waiting="0"/>
+               </synch-call>
+            </activity>
+            <precedence>
+               <pre>
+                  <activity name="cgiStart"/>
+               </pre>
+               <post-OR>
+                  <activity name="cdPage" prob="0.4"/>
+                  <activity name="procData" prob="0.6"/>
+               </post-OR>
+            </precedence>
+            <precedence>
+               <pre-OR>
+                  <activity name="procData"/>
+                  <activity name="cdPage"/>
+               </pre-OR>
+               <post>
+                  <activity name="cgiAppEnd"/>
+               </post>
+            </precedence>
+            <precedence>
+               <pre>
+                  <activity name="cgiAppEnd"/>
+               </pre>
+            </precedence>
+            <reply-entry name="cgiApp">
+               <reply-activity name="cgiAppEnd"/>
+            </reply-entry>
+         </task-activities>
+      </task>
+   </processor>
+   <processor name="WSDisk" scheduling="fcfs">
+      <result-processor utilization="0.213817"/>
+      <task name="WebDisk" scheduling="fcfs">
+         <result-task throughput="2.13817" utilization="0.213817" phase1-utilization="0.213817" proc-utilization="0.213817"/>
+         <entry name="webRorW" type="PH1PH2">
+            <result-entry utilization="0.213817" throughput="2.13817" squared-coeff-variation="1" proc-utilization="0.213817" throughput-bound="1.71944"/>
+            <entry-phase-activities>
+               <activity name="webRorW_ph1" phase="1" host-demand-mean="0.1">
+                  <result-activity proc-waiting="0" service-time="0.1" utilization="0.213817" service-time-variance="0.01"/>
+               </activity>
+            </entry-phase-activities>
+         </entry>
+      </task>
+   </processor>
+   <processor name="DBP" scheduling="fcfs" multiplicity="20">
+      <result-processor utilization="15.9059"/>
+      <task name="DBProcess" scheduling="fcfs" multiplicity="25">
+         <result-task throughput="0.670494" utilization="16.4115" phase1-utilization="16.4115" proc-utilization="15.9059"/>
+         <entry name="dbUpdate" type="PH1PH2">
+            <result-entry utilization="7.72516" throughput="0.2496" squared-coeff-variation="0.669821" proc-utilization="7.488" throughput-bound="0.473292"/>
+            <entry-phase-activities>
+               <activity name="dbUpdate_ph1" phase="1" host-demand-mean="30">
+                  <result-activity proc-waiting="0.0924636" service-time="30.9502" utilization="7.72516" service-time-variance="641.63"/>
+                  <synch-call dest="read" calls-mean="2">
+                     <result-call waiting="0.0429509"/>
+                  </synch-call>
+                  <synch-call dest="write" calls-mean="4">
+                     <result-call waiting="0.0429509"/>
+                  </synch-call>
+               </activity>
+            </entry-phase-activities>
+         </entry>
+         <entry name="dbRead" type="PH1PH2">
+            <result-entry utilization="8.68634" throughput="0.420894" squared-coeff-variation="0.999063" proc-utilization="8.41788" throughput-bound="0.587443"/>
+            <entry-phase-activities>
+               <activity name="dbRead_ph1" phase="1" host-demand-mean="20">
+                  <result-activity proc-waiting="0.0660454" service-time="20.6378" utilization="8.68634" service-time-variance="425.522"/>
+                  <synch-call dest="read" calls-mean="4">
+                     <result-call waiting="0.0429509"/>
+                  </synch-call>
+               </activity>
+            </entry-phase-activities>
+         </entry>
+      </task>
+   </processor>
+   <processor name="DBDisk" scheduling="fcfs">
+      <result-processor utilization="0.318116"/>
+      <task name="DBOperation" scheduling="fcfs">
+         <result-task throughput="3.18116" utilization="0.318116" phase1-utilization="0.318116" proc-utilization="0.318116"/>
+         <entry name="read" type="PH1PH2">
+            <result-entry utilization="0.218277" throughput="2.18277" squared-coeff-variation="1" proc-utilization="0.218277" throughput-bound="2.55751"/>
+            <entry-phase-activities>
+               <activity name="read_ph1" phase="1" host-demand-mean="0.1">
+                  <result-activity proc-waiting="0" service-time="0.1" utilization="0.218277" service-time-variance="0.01"/>
+               </activity>
+            </entry-phase-activities>
+         </entry>
+         <entry name="write" type="PH1PH2">
+            <result-entry utilization="0.0998395" throughput="0.998395" squared-coeff-variation="1" proc-utilization="0.0998395" throughput-bound="2.55751"/>
+            <entry-phase-activities>
+               <activity name="write_ph1" phase="1" host-demand-mean="0.1">
+                  <result-activity proc-waiting="0" service-time="0.1" utilization="0.0998395" service-time-variance="0.01"/>
+               </activity>
+            </entry-phase-activities>
+         </entry>
+      </task>
+   </processor>
+   <processor name="ProtocolP1" scheduling="fcfs" multiplicity="6">
+      <result-processor utilization="3.06021"/>
+      <task name="Distributor" scheduling="fcfs" multiplicity="60">
+         <result-task throughput="2.4483" utilization="49.598" phase1-utilization="49.598" proc-utilization="2.4483"/>
+         <entry name="distributor" type="NONE">
+            <result-entry utilization="49.598" throughput="2.4483" squared-coeff-variation="4.52483" proc-utilization="2.4483" throughput-bound="1.96732" phase1-service-time="20.2581" phase1-service-time-variance="1856.95" phase1-utilization="49.598"/>
+         </entry>
+         <task-activities>
+            <activity name="analyze" bound-to-entry="distributor" host-demand-mean="1">
+               <result-activity proc-waiting="0.00940743" service-time="1.00941" utilization="2.47133" service-time-variance="1.00009" throughput="2.4483" proc-utilization="2.4483"/>
+            </activity>
+            <activity name="cgiDrive">
+               <result-activity proc-waiting="0" service-time="113.364" utilization="27.755" service-time-variance="55347.4" throughput="0.24483" proc-utilization="0"/>
+               <synch-call dest="protocol2" calls-mean="1">
+                  <result-call waiting="7.34714"/>
+               </synch-call>
+            </activity>
+            <activity name="distributeEnd">
+               <result-activity proc-waiting="0" service-time="0" utilization="0" throughput="2.4483" proc-utilization="0"/>
+            </activity>
+            <activity name="staticPage">
+               <result-activity proc-waiting="0" service-time="8.79143" utilization="19.3717" service-time-variance="392.945" throughput="2.20347" proc-utilization="0"/>
+               <synch-call dest="protocol1" calls-mean="1">
+                  <result-call waiting="0.00596563"/>
+               </synch-call>
+            </activity>
+            <precedence>
+               <pre>
+                  <activity name="analyze"/>
+               </pre>
+               <post-OR>
+                  <activity name="cgiDrive" prob="0.1"/>
+                  <activity name="staticPage" prob="0.9"/>
+               </post-OR>
+            </precedence>
+            <precedence>
+               <pre-OR>
+                  <activity name="staticPage"/>
+                  <activity name="cgiDrive"/>
+               </pre-OR>
+               <post>
+                  <activity name="distributeEnd"/>
+               </post>
+            </precedence>
+            <precedence>
+               <pre>
+                  <activity name="distributeEnd"/>
+               </pre>
+            </precedence>
+            <reply-entry name="distributor">
+               <reply-activity name="distributeEnd"/>
+            </reply-entry>
+         </task-activities>
+      </task>
+      <task name="Protocol1" scheduling="fcfs" multiplicity="30">
+         <result-task throughput="2.20286" utilization="19.3539" phase1-utilization="19.3539" proc-utilization="0.550714"/>
+         <entry name="protocol1" type="PH1PH2">
+            <result-entry utilization="19.3539" throughput="2.20286" squared-coeff-variation="3.09385" proc-utilization="0.550714" throughput-bound="1.77059"/>
+            <entry-phase-activities>
+               <activity name="protocol1_ph1" phase="1" host-demand-mean="0.25">
+                  <result-activity proc-waiting="0.0190378" service-time="8.78583" utilization="19.3539" service-time-variance="238.817"/>
+                  <synch-call dest="webServer" calls-mean="1">
+                     <result-call waiting="0"/>
+                  </synch-call>
+               </activity>
+            </entry-phase-activities>
+         </entry>
+      </task>
+      <task name="Protocol2" scheduling="fcfs" multiplicity="30">
+         <result-task throughput="0.244762" utilization="25.9497" phase1-utilization="25.9497" proc-utilization="0.0611905"/>
+         <entry name="protocol2" type="PH1PH2">
+            <result-entry utilization="25.9497" throughput="0.244762" squared-coeff-variation="2.63484" proc-utilization="0.0611905" throughput-bound="0.196732"/>
+            <entry-phase-activities>
+               <activity name="protocol2_ph1" phase="1" host-demand-mean="0.25">
+                  <result-activity proc-waiting="0.0189953" service-time="106.02" utilization="25.9497" service-time-variance="29616.3"/>
+                  <synch-call dest="cgiApp" calls-mean="1">
+                     <result-call waiting="0"/>
+                  </synch-call>
+               </activity>
+            </entry-phase-activities>
+         </entry>
+      </task>
+   </processor>
+   <processor name="ProtocolP2" scheduling="fcfs" multiplicity="12">
+      <result-processor utilization="10.3701"/>
+      <task name="ProtocolReply" scheduling="fcfs" multiplicity="15">
+         <result-task throughput="41.4805" utilization="12.5157" phase1-utilization="12.5157" proc-utilization="10.3701"/>
+         <entry name="packet" type="PH1PH2">
+            <result-entry utilization="12.5157" throughput="41.4805" squared-coeff-variation="0.715917" proc-utilization="10.3701" throughput-bound="33.3657"/>
+            <entry-phase-activities>
+               <activity name="packet_ph1" phase="1" host-demand-mean="0.25">
+                  <result-activity proc-waiting="0.0517304" service-time="0.301726" utilization="12.5157" service-time-variance="0.065176"/>
+               </activity>
+            </entry-phase-activities>
+         </entry>
+      </task>
+   </processor>
+</lqn-model>
